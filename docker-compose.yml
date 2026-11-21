@@ -1,0 +1,18 @@
+services:
+  spyserver:
+    build:
+      context: .
+    image: spyserver:distroless
+    container_name: spyserver
+    restart: unless-stopped
+    ports:
+      - "5555:5555"
+    devices:
+      - "/dev/bus/usb:/dev/bus/usb"
+    environment:
+      BIND_PORT: "5555"
+      LIST_IN_DIRECTORY: "0"
+      DEVICE_TYPE: "Auto"
+      DEVICE_SERIAL: "0"
+      MAXIMUM_CLIENTS: "1"
+      ALLOW_CONTROL: "1"
