@@ -1,5 +1,10 @@
 # docker-spyserver
 
+[![Build](https://github.com/tjwalkr3/docker-spyserver/actions/workflows/docker.yml/badge.svg)](https://github.com/tjwalkr3/docker-spyserver/actions/workflows/docker.yml)
+[![Docker Hub version](https://img.shields.io/docker/v/tjwalkr3/spyserver?label=docker%20hub)](https://hub.docker.com/r/tjwalkr3/spyserver)
+[![Image size](https://img.shields.io/docker/image-size/tjwalkr3/spyserver/latest)](https://hub.docker.com/r/tjwalkr3/spyserver/tags)
+[![Docker pulls](https://img.shields.io/docker/pulls/tjwalkr3/spyserver)](https://hub.docker.com/r/tjwalkr3/spyserver)
+
 A minimal, distroless Docker image for [SpyServer](https://airspy.com/directory/), the
 Airspy / RTL-SDR network streaming server. The image is built on
 `gcr.io/distroless/cc-debian13` with no shell or package manager. It builds for amd64,
