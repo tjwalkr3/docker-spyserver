@@ -26,6 +26,9 @@ RUN set -eux; \
       "libairspyhf1:${debarch}" \
       "libusb-1.0-0:${debarch}" \
       "libudev1:${debarch}"; \
+    apt-get download "coreutils:${debarch}"; \
+    dpkg-deb -x coreutils_*.deb /tmp/coreutils; \
+    rm coreutils_*.deb; \
     rm -rf /var/lib/apt/lists/*; \
     wget -q "https://airspy.com/downloads/${f}.tgz"; \
     tar xzf "${f}.tgz"; \
@@ -46,6 +49,8 @@ RUN set -eux; \
     done; \
     cp -L "${LIBDIR}/libusb-1.0.so.0" "${DEST}/libusb-1.0.so.0"; \
     cp -L "${LIBDIR}/libudev.so.1"    "${DEST}/libudev.so.1"; \
+    mkdir -p /rootfs/usr/libexec/coreutils; \
+    cp /tmp/coreutils/usr/libexec/coreutils/libstdbuf.so /rootfs/usr/libexec/coreutils/libstdbuf.so; \
     for applet in sh sed sleep nc; do \
         ln -sf busybox "/rootfs/usr/bin/${applet}"; \
     done

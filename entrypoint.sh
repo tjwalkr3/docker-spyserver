@@ -48,4 +48,8 @@ if [ -n "$HFP_PREAMP" ]; then
 fi
 
 sleep 10
+
+# Line-buffer stdout so logs show up without a TTY
+export LD_PRELOAD=/usr/libexec/coreutils/libstdbuf.so
+export _STDBUF_O=L
 exec /usr/bin/spyserver "$CONFIG"
