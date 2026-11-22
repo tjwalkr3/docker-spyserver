@@ -1,7 +1,7 @@
 # docker-spyserver
 
 A minimal, distroless Docker image for [SpyServer](https://airspy.com/directory/), the
-Airspy / RTL-SDR network streaming server. The image is about 44 MB, built on
+Airspy / RTL-SDR network streaming server. The image is built on
 `gcr.io/distroless/cc-debian13` with no shell or package manager. It builds for amd64,
 arm64, and arm/v7, and supports RTL-SDR, Airspy, and Airspy HF+ devices.
 
