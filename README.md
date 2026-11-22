@@ -1,13 +1,11 @@
 # docker-spyserver
 
 A minimal, distroless Docker image for [SpyServer](https://airspy.com/directory/), the
-Airspy / RTL-SDR network streaming server. The final image is about 38 MB, built on
-`gcr.io/distroless/cc-debian12` with no shell or package manager. It runs on amd64 and
-supports RTL-SDR, Airspy, and Airspy HF+ devices.
+Airspy / RTL-SDR network streaming server. The image is about 44 MB, built on
+`gcr.io/distroless/cc-debian13` with no shell or package manager. It builds for amd64,
+arm64, and arm/v7, and supports RTL-SDR, Airspy, and Airspy HF+ devices.
 
-The image has a built-in healthcheck: a static busybox `nc` probe confirms SpyServer is
-accepting TCP connections on its bind port. Everything is configured through environment
-variables (see [Configuration](#configuration)).
+It has a built-in TCP healthcheck and is configured through environment variables.
 
 ## Quick start
 
@@ -31,6 +29,12 @@ docker run -d --name spyserver \
 
 Point your SDR client (e.g. SDR#, SDR++, CubicSDR) at `sdr://<host>:5555`.
 
+A plain `docker build` targets the host architecture. Use `buildx` to build others:
+
+```bash
+docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7 -t spyserver:distroless .
+```
+
 ## Device access
 
 SpyServer needs the USB SDR dongle. The whole USB bus is passed through so the device
@@ -46,9 +50,8 @@ If the device still isn't detected, replace that block with `privileged: true`.
 ## Healthcheck
 
 The image ships a `HEALTHCHECK` that runs `nc -z 127.0.0.1 $BIND_PORT` every 30s
-(after a 30s start period). It reports `healthy` once the listener is open and
-`unhealthy` if the port stops accepting connections. It honours `BIND_PORT`, so no
-changes are needed when you move the port.
+(after a 30s start period), so the container goes `unhealthy` if the port stops
+accepting connections. It honours `BIND_PORT`.
 
 ## Configuration
 

@@ -16,16 +16,25 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       libudev1 \
     && rm -rf /var/lib/apt/lists/*
 
+ARG TARGETARCH
+ARG TARGETVARIANT
 WORKDIR /tmp/ss
-RUN wget -q https://airspy.com/downloads/spyserver-linux-x64.tgz \
-    && tar xzf spyserver-linux-x64.tgz \
-    && rm spyserver-linux-x64.tgz
+RUN set -eux; \
+    case "${TARGETARCH}${TARGETVARIANT}" in \
+      amd64)        f=spyserver-linux-x64 ;; \
+      arm64)        f=spyserver-arm64 ;; \
+      arm|armv6|armv7) f=spyserver-arm32 ;; \
+      *) echo "unsupported platform: ${TARGETARCH}${TARGETVARIANT}" >&2; exit 1 ;; \
+    esac; \
+    wget -q "https://airspy.com/downloads/${f}.tgz"; \
+    tar xzf "${f}.tgz"; \
+    rm "${f}.tgz"
 
 COPY --from=busybox /bin/busybox /rootfs/usr/bin/busybox
 
 RUN set -eux; \
-    LIBDIR=/usr/lib/x86_64-linux-gnu; \
-    DEST=/rootfs${LIBDIR}; \
+    LIBDIR="$(dirname "$(find /usr/lib -name 'librtlsdr.so.0*' | head -n1)")"; \
+    DEST="/rootfs${LIBDIR}"; \
     mkdir -p /rootfs/usr/bin /rootfs/etc/spyserver "${DEST}"; \
     cp /tmp/ss/spyserver        /rootfs/usr/bin/spyserver; \
     cp /tmp/ss/spyserver.config /rootfs/etc/spyserver/spyserver.config; \
@@ -46,8 +55,7 @@ FROM gcr.io/distroless/cc-debian13
 COPY --from=builder /rootfs/ /
 COPY entrypoint.sh /entrypoint.sh
 
-ENV LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:/lib/x86_64-linux-gnu \
-    PATH=/usr/bin:/bin
+ENV PATH=/usr/bin:/bin
 
 EXPOSE 5555
 
