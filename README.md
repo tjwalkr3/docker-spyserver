@@ -96,5 +96,5 @@ entrypoint applies them, and the descriptions are the config file's own comments
 
 ## Credits
 
-The `entrypoint.sh` configuration script is borrowed from
+The `entrypoint.sh` configuration script was inspired by
 [f4fhh/spyserver_container](https://github.com/f4fhh/spyserver_container).
