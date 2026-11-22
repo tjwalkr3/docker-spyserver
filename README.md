@@ -56,8 +56,7 @@ accepting connections. It honours `BIND_PORT`.
 ## Configuration
 
 Each variable maps to a setting in `spyserver.config`. A variable is applied only when you
-set it; leave it unset and spyserver keeps its stock value. Rows are in the order the
-entrypoint applies them, and the descriptions are the config file's own comments.
+set it; leave it unset and spyserver keeps its default value. 
 
 | Environment variable | `spyserver.config` key | Description |
 | --- | --- | --- |
@@ -93,6 +92,9 @@ entrypoint applies them, and the descriptions are the config file's own comments
 | `INPUT_BUFFER_COUNT` | `input_buffer_count` | Input IQ Buffering. |
 | `OUTPUT_BUFFER_SIZE_MS` | `output_buffer_size_ms` | Output Network Buffer Size (in milliseconds). |
 | `HFP_PREAMP` | `hfp_preamp` | AirspyHF+ preamp. Undocumented; not in the stock config. |
+
+*Keys and descriptions are taken from the `spyserver.config` file that ships with SpyServer,
+except for `hfp_preamp`.*
 
 ## Credits
 
