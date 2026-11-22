@@ -4,28 +4,29 @@
 FROM busybox:musl AS busybox
 
 # Stage 2: fetch spyserver (and runtime libs) and assemble a minimal rootfs
-FROM debian:trixie-slim AS builder
-
-RUN apt-get update && apt-get install -y --no-install-recommends \
-      ca-certificates \
-      wget \
-      librtlsdr0 \
-      libairspy0 \
-      libairspyhf1 \
-      libusb-1.0-0 \
-      libudev1 \
-    && rm -rf /var/lib/apt/lists/*
+FROM --platform=$BUILDPLATFORM debian:trixie-slim AS builder
 
 ARG TARGETARCH
 ARG TARGETVARIANT
 WORKDIR /tmp/ss
 RUN set -eux; \
     case "${TARGETARCH}${TARGETVARIANT}" in \
-      amd64)        f=spyserver-linux-x64 ;; \
-      arm64)        f=spyserver-arm64 ;; \
-      arm|armv6|armv7) f=spyserver-arm32 ;; \
+      amd64)     debarch=amd64; f=spyserver-linux-x64 ;; \
+      arm64)     debarch=arm64; f=spyserver-arm64 ;; \
+      arm|armv7) debarch=armhf; f=spyserver-arm32 ;; \
       *) echo "unsupported platform: ${TARGETARCH}${TARGETVARIANT}" >&2; exit 1 ;; \
     esac; \
+    [ "${debarch}" = "$(dpkg --print-architecture)" ] || dpkg --add-architecture "${debarch}"; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends \
+      ca-certificates \
+      wget \
+      "librtlsdr0:${debarch}" \
+      "libairspy0:${debarch}" \
+      "libairspyhf1:${debarch}" \
+      "libusb-1.0-0:${debarch}" \
+      "libudev1:${debarch}"; \
+    rm -rf /var/lib/apt/lists/*; \
     wget -q "https://airspy.com/downloads/${f}.tgz"; \
     tar xzf "${f}.tgz"; \
     rm "${f}.tgz"
