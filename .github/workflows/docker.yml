@@ -32,7 +32,6 @@ jobs:
           images: docker.io/${{ vars.DOCKERHUB_USERNAME }}/spyserver
           tags: |
             type=raw,value=latest,enable={{is_default_branch}}
-            type=sha
             type=raw,value=${{ github.run_number }}.${{ github.run_attempt }}
 
       - uses: docker/login-action@v4
