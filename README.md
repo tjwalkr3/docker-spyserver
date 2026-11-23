@@ -42,13 +42,16 @@ docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7 -t spyserver
 
 ## Device access
 
-SpyServer needs the USB SDR dongle. The whole USB bus is passed through so the device
-survives re-plug and re-enumeration:
+SpyServer needs the USB SDR dongle. The whole USB bus is passed through:
 
 ```yaml
 devices:
   - "/dev/bus/usb:/dev/bus/usb"
 ```
+
+Plug the SDR in before starting the container. Docker only passes through the USB devices
+that are present when the container starts, so if you plug it in later, or unplug and
+re-plug it, restart the container (`docker restart spyserver`).
 
 If the device still isn't detected, replace that block with `privileged: true`.
 

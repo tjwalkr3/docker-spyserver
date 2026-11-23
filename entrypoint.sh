@@ -46,8 +46,6 @@ opt() { [ -z "$2" ] || cfg "$1" "$2"; } # Written only when set (commented out i
   fi
 } > "$CONFIG"
 
-sleep 10
-
 # Line-buffer stdout so logs show up without a TTY
 export LD_PRELOAD=/usr/libexec/coreutils/libstdbuf.so
 export _STDBUF_O=L
