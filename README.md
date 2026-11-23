@@ -60,46 +60,67 @@ accepting connections. It honours `BIND_PORT`.
 
 ## Configuration
 
-Each variable maps to a setting in `spyserver.config`. A variable is applied only when you
-set it; leave it unset and spyserver keeps its default value. 
+The entrypoint writes `spyserver.config` from scratch on every container start, using
+only environment variables. Each variable maps to one setting:
 
-| Environment variable | `spyserver.config` key | Description |
-| --- | --- | --- |
-| `BIND_HOST` | `bind_host` | TCP Listener. |
-| `BIND_PORT` | `bind_port` | TCP Listener. |
-| `LIST_IN_DIRECTORY` | `list_in_directory` | List Server in Airspy Directory. |
-| `OWNER_NAME` | `owner_name` | Owner Name. For example: John Doe L8ZEE. |
-| `OWNER_EMAIL` | `owner_email` | Owner email. For example: john@doe.com. |
-| `ANTENNA_TYPE` | `antenna_type` | Antenna. For example: Random Wire/Magnetic Loop/Mini-Whip/Inverted V/etc. |
-| `ANTENNA_LOCATION` | `antenna_location` | Antenna Location. For example: 48.858332, 2.294560. |
-| `GENERAL_DESCRIPTION` | `general_description` | General Description. |
-| `MAXIMUM_CLIENTS` | `maximum_clients` | User sessions. |
-| `MAXIMUM_SESSION_DURATION` | `maximum_session_duration` | Maximum session duration. In minutes. 0 for no limit. |
-| `ALLOW_CONTROL` | `allow_control` | Allow clients to retune and change of gain of the device. |
-| `DEVICE_TYPE` | `device_type` | Device Type. Possible Values: AirspyOne (R0, R2, Mini), AirspyHF+, AOR, RTL-SDR, Auto (Scans for the first available device). |
-| `DEVICE_SERIAL` | `device_serial` | Device Serial Number as 64bit Hex. A value of 0 will acquire the first available device. |
-| `DEVICE_SAMPLE_RATE` | `device_sample_rate` | Device Sample Rate. Comment to use the device's default. |
-| `FORCE_8BIT` | `force_8bit` | Force 8bit Compression Mode. |
-| `MAXIMUM_BANDWIDTH` | `maximum_bandwidth` | Maximum Bandwidth. Limits the maximum IQ bandwidth the clients can set. |
-| `FFT_FPS` | `fft_fps` | FFT Frames Per Second. |
-| `FFT_BIN_BITS` | `fft_bin_bits` | FFT Bins. Bins = 2^fft_bin_bits. |
-| `INITIAL_FREQUENCY` | `initial_frequency` | Initial Center Frequency. |
-| `MINIMUM_FREQUENCY` | `minimum_frequency` | Minimum Tunable Frequency. Comment if using the device default. |
-| `MAXIMUM_FREQUENCY` | `maximum_frequency` | Maximum Tunable Frequency. Comment if using the device default. |
-| `FREQUENCY_CORRECTION_PPB` | `frequency_correction_ppb` | Frequency Correction in PPB. |
-| `INITIAL_GAIN` | `initial_gain` | Initial Gain. |
-| `AOR_ANTENNA` | `aor_antenna` | AOR IQ Settings. |
-| `AOR_AUTO_GAIN` | `aor_auto_gain` | AOR IQ Settings. |
-| `RTL_SAMPLING_MODE` | `rtl_sampling_mode` | RTL-SDR Sampling mode. Quadrature = 0, Direct Sampling I Branch = 1, Direct Sampling Q Branch = 2. |
-| `CONVERTER_OFFSET` | `converter_offset` | Converter Offset. Set to -120000000 to enable the SpyVerter offset. |
-| `ENABLE_BIAS_TEE` | `enable_bias_tee` | Bias-Tee. For AirspyOne only - Useful for LNA's and SpyVerter. |
-| `INPUT_BUFFER_SIZE_MS` | `input_buffer_size_ms` | Input IQ Buffering. |
-| `INPUT_BUFFER_COUNT` | `input_buffer_count` | Input IQ Buffering. |
-| `OUTPUT_BUFFER_SIZE_MS` | `output_buffer_size_ms` | Output Network Buffer Size (in milliseconds). |
-| `HFP_PREAMP` | `hfp_preamp` | AirspyHF+ preamp. Undocumented; not in the stock config. |
+- A key with a **Default** is always written. Leave the variable unset to get the default,
+  which matches the `spyserver.config` that ships with SpyServer.
+- A key marked **—** is commented out in the stock config. It's written only when you set
+  the variable. Otherwise, SpyServer or the device uses its own default (for example, the
+  HF+ picks its 768000 sample rate).
+
+| Environment variable | `spyserver.config` key | Default | Description |
+| --- | --- | --- | --- |
+| `BIND_HOST` | `bind_host` | `0.0.0.0` | TCP Listener. |
+| `BIND_PORT` | `bind_port` | `5555-6666` | TCP Listener. |
+| `LIST_IN_DIRECTORY` | `list_in_directory` | `1` | List Server in Airspy Directory. |
+| `OWNER_NAME` | `owner_name` | *(empty)* | Owner Name. For example: John Doe L8ZEE. |
+| `OWNER_EMAIL` | `owner_email` | *(empty)* | Owner email. For example: john@doe.com. |
+| `ANTENNA_TYPE` | `antenna_type` | *(empty)* | Antenna. For example: Random Wire/Magnetic Loop/Mini-Whip/Inverted V/etc. |
+| `ANTENNA_LOCATION` | `antenna_location` | *(empty)* | Antenna Location. For example: 48.858332, 2.294560. |
+| `GENERAL_DESCRIPTION` | `general_description` | *(empty)* | General Description. |
+| `MAXIMUM_CLIENTS` | `maximum_clients` | `1` | User sessions. |
+| `MAXIMUM_SESSION_DURATION` | `maximum_session_duration` | — | Maximum session duration. In minutes. 0 for no limit. |
+| `ALLOW_CONTROL` | `allow_control` | `1` | Allow clients to retune and change of gain of the device. |
+| `DEVICE_TYPE` | `device_type` | `Auto` | Device Type. Possible Values: AirspyOne (R0, R2, Mini), AirspyHF+, AOR, RTL-SDR, Auto (Scans for the first available device). |
+| `DEVICE_SERIAL` | `device_serial` | `0` | Device Serial Number as 64bit Hex. A value of 0 will acquire the first available device. |
+| `DEVICE_SAMPLE_RATE` | `device_sample_rate` | — | Device Sample Rate. Airspy R0, R2: 10000000 or 2500000. Airspy Mini: 6000000 or 3000000. Airspy HF+: 768000. RTL-SDR: 500000 to 3200000. |
+| `FORCE_8BIT` | `force_8bit` | — | Force 8bit Compression Mode. |
+| `MAXIMUM_BANDWIDTH` | `maximum_bandwidth` | — | Maximum Bandwidth. Limits the maximum IQ bandwidth the clients can set. Recommended: 200000 for WFM, 15000 for narrow band modes. |
+| `FFT_FPS` | `fft_fps` | `15` | FFT Frames Per Second. |
+| `FFT_BIN_BITS` | `fft_bin_bits` | `15` | FFT Bins. Bins = 2^fft_bin_bits. |
+| `INITIAL_FREQUENCY` | `initial_frequency` | — | Initial Center Frequency. |
+| `MINIMUM_FREQUENCY` | `minimum_frequency` | — | Minimum Tunable Frequency. |
+| `MAXIMUM_FREQUENCY` | `maximum_frequency` | — | Maximum Tunable Frequency. |
+| `FREQUENCY_CORRECTION_PPB` | `frequency_correction_ppb` | — | Frequency Correction in PPB. |
+| `INITIAL_GAIN` | `initial_gain` | — | Initial Gain. |
+| `AOR_ANTENNA` | `aor_antenna` | — | AOR IQ Settings. |
+| `AOR_AUTO_GAIN` | `aor_auto_gain` | — | AOR IQ Settings. |
+| `RTL_SAMPLING_MODE` | `rtl_sampling_mode` | — | RTL-SDR Sampling mode. Quadrature = 0, Direct Sampling I Branch = 1, Direct Sampling Q Branch = 2. |
+| `CONVERTER_OFFSET` | `converter_offset` | — | Converter Offset. Set to -120000000 to enable the SpyVerter offset. |
+| `ENABLE_BIAS_TEE` | `enable_bias_tee` | — | Bias-Tee. For AirspyOne only - Useful for LNA's and SpyVerter. |
+| `INPUT_BUFFER_SIZE_MS` | `input_buffer_size_ms` | `10` | Input IQ Buffering. |
+| `INPUT_BUFFER_COUNT` | `input_buffer_count` | `4` | Input IQ Buffering. |
+| `OUTPUT_BUFFER_SIZE_MS` | `output_buffer_size_ms` | `50` | Output Network Buffer Size (in milliseconds). |
+| `HFP_PREAMP` | `hfp_preamp` | — | AirspyHF+ preamp. Undocumented; not in the stock config. |
 
 *Keys and descriptions are taken from the `spyserver.config` file that ships with SpyServer,
 except for `hfp_preamp`.*
+
+### Other settings
+
+To set a key that isn't in the table, put one or more `key = value` lines in
+`EXTRA_CONFIG`. They're appended to the end of the generated config as-is:
+
+```yaml
+environment:
+  EXTRA_CONFIG: |
+    some_key = 1
+    another_key = foo
+```
+
+Don't use `EXTRA_CONFIG` for a key that has its own variable. The key would appear twice,
+and it isn't documented which line SpyServer uses.
 
 ## Credits
 

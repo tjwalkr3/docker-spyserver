@@ -3,49 +3,48 @@ set -e
 
 CONFIG=/etc/spyserver/spyserver.config
 
-# Apply a config option only when its variable is set
-set_config() {
-  if [ -n "$2" ]; then
-    sed -i "s/^#*$1 .*/$1 = $2/" "$CONFIG"
+cfg() { printf '%s =%s\n' "$1" "${2:+ $2}"; } # Always written (defaults given in sample config)
+opt() { [ -z "$2" ] || cfg "$1" "$2"; } # Written only when set (commented out in sample config)
+
+{
+  cfg bind_host                "${BIND_HOST:-0.0.0.0}"
+  cfg bind_port                "${BIND_PORT:-5555-6666}"
+  cfg list_in_directory        "${LIST_IN_DIRECTORY:-1}"
+  cfg owner_name               "$OWNER_NAME"
+  cfg owner_email              "$OWNER_EMAIL"
+  cfg antenna_type             "$ANTENNA_TYPE"
+  cfg antenna_location         "$ANTENNA_LOCATION"
+  cfg general_description      "$GENERAL_DESCRIPTION"
+  cfg maximum_clients          "${MAXIMUM_CLIENTS:-1}"
+  opt maximum_session_duration "$MAXIMUM_SESSION_DURATION"
+  cfg allow_control            "${ALLOW_CONTROL:-1}"
+  cfg device_type              "${DEVICE_TYPE:-Auto}"
+  cfg device_serial            "${DEVICE_SERIAL:-0}"
+  opt device_sample_rate       "$DEVICE_SAMPLE_RATE"
+  opt force_8bit               "$FORCE_8BIT"
+  opt maximum_bandwidth        "$MAXIMUM_BANDWIDTH"
+  cfg fft_fps                  "${FFT_FPS:-15}"
+  cfg fft_bin_bits             "${FFT_BIN_BITS:-15}"
+  opt initial_frequency        "$INITIAL_FREQUENCY"
+  opt minimum_frequency        "$MINIMUM_FREQUENCY"
+  opt maximum_frequency        "$MAXIMUM_FREQUENCY"
+  opt frequency_correction_ppb "$FREQUENCY_CORRECTION_PPB"
+  opt initial_gain             "$INITIAL_GAIN"
+  opt aor_antenna              "$AOR_ANTENNA"
+  opt aor_auto_gain            "$AOR_AUTO_GAIN"
+  opt rtl_sampling_mode        "$RTL_SAMPLING_MODE"
+  opt converter_offset         "$CONVERTER_OFFSET"
+  opt enable_bias_tee          "$ENABLE_BIAS_TEE"
+  cfg input_buffer_size_ms     "${INPUT_BUFFER_SIZE_MS:-10}"
+  cfg input_buffer_count       "${INPUT_BUFFER_COUNT:-4}"
+  cfg output_buffer_size_ms    "${OUTPUT_BUFFER_SIZE_MS:-50}"
+  opt hfp_preamp               "$HFP_PREAMP" # AirspyHF+ only; not in the stock config
+
+  # Extra "key = value" lines, written as-is
+  if [ -n "$EXTRA_CONFIG" ]; then
+    printf '%s\n' "$EXTRA_CONFIG"
   fi
-}
-
-set_config bind_host                "$BIND_HOST"
-set_config bind_port                "$BIND_PORT"
-set_config list_in_directory        "$LIST_IN_DIRECTORY"
-set_config owner_name               "$OWNER_NAME"
-set_config owner_email              "$OWNER_EMAIL"
-set_config antenna_type             "$ANTENNA_TYPE"
-set_config antenna_location         "$ANTENNA_LOCATION"
-set_config general_description      "$GENERAL_DESCRIPTION"
-set_config maximum_clients          "$MAXIMUM_CLIENTS"
-set_config maximum_session_duration "$MAXIMUM_SESSION_DURATION"
-set_config allow_control            "$ALLOW_CONTROL"
-set_config device_type              "$DEVICE_TYPE"
-set_config device_serial            "$DEVICE_SERIAL"
-set_config device_sample_rate       "$DEVICE_SAMPLE_RATE"
-set_config force_8bit               "$FORCE_8BIT"
-set_config maximum_bandwidth        "$MAXIMUM_BANDWIDTH"
-set_config fft_fps                  "$FFT_FPS"
-set_config fft_bin_bits             "$FFT_BIN_BITS"
-set_config initial_frequency        "$INITIAL_FREQUENCY"
-set_config minimum_frequency        "$MINIMUM_FREQUENCY"
-set_config maximum_frequency        "$MAXIMUM_FREQUENCY"
-set_config frequency_correction_ppb "$FREQUENCY_CORRECTION_PPB"
-set_config initial_gain             "$INITIAL_GAIN"
-set_config aor_antenna              "$AOR_ANTENNA"
-set_config aor_auto_gain            "$AOR_AUTO_GAIN"
-set_config rtl_sampling_mode        "$RTL_SAMPLING_MODE"
-set_config converter_offset         "$CONVERTER_OFFSET"
-set_config enable_bias_tee          "$ENABLE_BIAS_TEE"
-set_config input_buffer_size_ms     "$INPUT_BUFFER_SIZE_MS"
-set_config input_buffer_count       "$INPUT_BUFFER_COUNT"
-set_config output_buffer_size_ms    "$OUTPUT_BUFFER_SIZE_MS"
-
-# AirspyHF+ only: undocumented; not in the stock config
-if [ -n "$HFP_PREAMP" ]; then
-  echo "hfp_preamp = $HFP_PREAMP" >> "$CONFIG"
-fi
+} > "$CONFIG"
 
 sleep 10
 

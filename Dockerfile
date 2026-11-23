@@ -40,8 +40,7 @@ RUN set -eux; \
     LIBDIR="$(dirname "$(find /usr/lib -name 'librtlsdr.so.0*' | head -n1)")"; \
     DEST="/rootfs${LIBDIR}"; \
     mkdir -p /rootfs/usr/bin /rootfs/etc/spyserver "${DEST}"; \
-    cp /tmp/ss/spyserver        /rootfs/usr/bin/spyserver; \
-    cp /tmp/ss/spyserver.config /rootfs/etc/spyserver/spyserver.config; \
+    cp /tmp/ss/spyserver /rootfs/usr/bin/spyserver; \
     for so in librtlsdr.so.0 libairspy.so.0 libairspyhf.so.1; do \
         bare="$(echo "$so" | sed 's/\.so.*/.so/')"; \
         cp -L "${LIBDIR}/${so}" "${DEST}/${so}"; \
